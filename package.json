@@ -1,0 +1,39 @@
+{
+  "name": "hugh-assistant",
+  "version": "0.5.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "migrate": "tsx src/lib/db/migrate.ts",
+    "test:smoke": "tsx src/scripts/smoke-test.ts",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run build && echo '✅ All checks passed'"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "3.0.58",
+    "@ai-sdk/mcp": "^1.0.25",
+    "@ai-sdk/react": "3.0.118",
+    "@auth/core": "^0.37.0",
+    "ai": "6.0.116",
+    "next": "^15.3.0",
+    "next-auth": "5.0.0-beta.25",
+    "pg": "^8.13.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

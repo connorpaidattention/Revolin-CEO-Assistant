@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+
+# Environment
+.env.local
+.env*.local
+.env
+
+# TypeScript
+*.tsbuildinfo
+
+# Claude Code
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vercel / deployment
+.vercel
+
+# IDE
+.vscode/
+.idea/
+
+# Coverage
+coverage/

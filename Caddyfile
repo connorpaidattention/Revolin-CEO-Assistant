@@ -1,0 +1,6 @@
+# Replace YOUR_DOMAIN with your actual domain
+YOUR_DOMAIN {
+    reverse_proxy app:3000 {
+        flush_interval -1
+    }
+}

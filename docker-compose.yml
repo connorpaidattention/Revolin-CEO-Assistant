@@ -1,0 +1,65 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      - DATABASE_URL=postgresql://hugh:hugh_secret@postgres:5432/hugh_assistant
+      - MCP_GOOGLE_WORKSPACE_URL=http://mcp-backend:8080/mcp
+      - HOSTNAME=0.0.0.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mcp-backend:
+        condition: service_started
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hugh
+      POSTGRES_PASSWORD: hugh_secret
+      POSTGRES_DB: hugh_assistant
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./src/lib/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    # Only reachable within the Docker network — not exposed to host
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hugh -d hugh_assistant"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  mcp-backend:
+    image: ghcr.io/taylorwilsdon/google_workspace_mcp:v1.8.0
+    restart: unless-stopped
+    # Only reachable within the Docker network — not exposed to host
+    expose:
+      - "8080"
+    env_file:
+      - .env.local
+    environment:
+      - SINGLE_USER_MODE=true
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

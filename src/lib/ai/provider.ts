@@ -4,8 +4,8 @@ import type { SharedV3ProviderOptions, JSONObject } from "@ai-sdk/provider";
 
 // ─── Models ──────────────────────────────────────────────────────
 
-export const PRIMARY_MODEL_ID = "claude-sonnet-4-6-20250217";
-export const SUMMARIZATION_MODEL_ID = "claude-haiku-4-5-20241022";
+export const PRIMARY_MODEL_ID = "claude-sonnet-4-6";
+export const SUMMARIZATION_MODEL_ID = "claude-haiku-4-5";
 export const STRATEGY_MODEL_ID = "claude-opus-4-6";
 
 export function getPrimaryModel(): LanguageModel {

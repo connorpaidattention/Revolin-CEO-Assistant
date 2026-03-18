@@ -26,7 +26,7 @@ import {
 } from "@/lib/ai/provider";
 import { getMcpTools } from "@/lib/ai/mcp-tools";
 import {
-  getOrCreateConversation,
+  createConversation,
   getConversationById,
   updateConversationTitle,
   saveMessage,
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
       // Use the conversation specified by the client
       conversation = { id: requestedConversationId };
     } else {
-      conversation = await getOrCreateConversation(session.user.email);
+      conversation = await createConversation(session.user.email);
     }
     const conversationId = conversation?.id ?? null;
 

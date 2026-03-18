@@ -40,6 +40,37 @@ export default function Chat() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const pendingMessageRef = useRef<string | null>(null);
+
+  // Restore conversation from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const savedId = params.get("c");
+    if (savedId) {
+      handleSelectConversation(savedId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist conversationId in URL
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (conversationId) {
+      url.searchParams.set("c", conversationId);
+    } else {
+      url.searchParams.delete("c");
+    }
+    window.history.replaceState({}, "", url.toString());
+  }, [conversationId]);
+
+  // Send pending message after conversation is created and transport is ready
+  useEffect(() => {
+    if (conversationId && pendingMessageRef.current && status === "ready") {
+      const text = pendingMessageRef.current;
+      pendingMessageRef.current = null;
+      sendMessage({ text });
+    }
+  }, [conversationId, status, sendMessage]);
 
   // Fetch system status on mount
   useEffect(() => {
@@ -54,18 +85,48 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim() && status === "ready") {
-      sendMessage({ text: input });
-      setInput("");
+    if (!input.trim() || status !== "ready") return;
+
+    const text = input;
+    setInput("");
+
+    if (!conversationId) {
+      try {
+        const res = await fetch("/api/conversations", { method: "POST" });
+        if (res.ok) {
+          const conv = await res.json();
+          pendingMessageRef.current = text;
+          setConversationId(conv.id);
+          return;
+        }
+      } catch (err) {
+        console.error("[chat] Failed to create conversation:", err);
+      }
     }
+
+    sendMessage({ text });
   };
 
-  const handleChipClick = (text: string) => {
-    if (status === "ready") {
-      sendMessage({ text });
+  const handleChipClick = async (text: string) => {
+    if (status !== "ready") return;
+
+    if (!conversationId) {
+      try {
+        const res = await fetch("/api/conversations", { method: "POST" });
+        if (res.ok) {
+          const conv = await res.json();
+          pendingMessageRef.current = text;
+          setConversationId(conv.id);
+          return;
+        }
+      } catch (err) {
+        console.error("[chat] Failed to create conversation:", err);
+      }
     }
+
+    sendMessage({ text });
   };
 
   const handleNewConversation = () => {
